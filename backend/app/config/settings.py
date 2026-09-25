@@ -11,6 +11,8 @@ class Settings(BaseSettings):
     azure_openai_api_key: str | None = None
     azure_openai_deployment: str | None = None
     azure_openai_api_version: str = '2024-10-21'
+    azure_openai_model_family: str = 'gpt-4o'
+    """The underlying model family backing the deployment, used for cost estimation. The deployment name is an arbitrary alias and often doesn't match a PRICING key."""
     mcp_server_url: str | None = None
     a2a_compliance_agent_url: str | None = None
     a2a_public_url: str = 'http://localhost:8080'

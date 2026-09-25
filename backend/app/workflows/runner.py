@@ -16,6 +16,7 @@ from app.workflows.main_workflow import build_workflow
 
 async def execute_adk_workflow(run_id: str, user_id: str, task: str, settings: Settings, mcp_client: Any, a2a_client: Any) -> None:
     model_name = settings.azure_openai_deployment or 'unconfigured'
+    pricing_model = settings.azure_openai_model_family
     try:
         with telemetry.begin_span('adk.workflow', run_id, agent_id='orchestrator', model=model_name):
             workflow = build_workflow(settings, mcp_client, a2a_client)
@@ -24,7 +25,7 @@ async def execute_adk_workflow(run_id: str, user_id: str, task: str, settings: S
             runner = Runner(agent=workflow, app_name='agentops', session_service=session_service)
             message = types.Content(role='user', parts=[types.Part(text=task)])
             async for event in runner.run_async(user_id=user_id, session_id=run_id, new_message=message):
-                await record_adk_event(run_id, event, model_name)
+                await record_adk_event(run_id, event, model_name, pricing_model)
             telemetry.finish(run_id, 'complete')
             await telemetry.emit(run_id, 'ADK workflow', 'Workflow completed from Runner event stream', 'system', status='complete', model=model_name)
     except asyncio.CancelledError:

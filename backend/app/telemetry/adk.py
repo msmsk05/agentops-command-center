@@ -16,10 +16,10 @@ def usage_from_event(event: Any) -> tuple[int | None, int | None, int | None]:
     return input_tokens, output_tokens, total_tokens
 
 
-async def record_adk_event(run_id: str, event: Any, model: str) -> None:
+async def record_adk_event(run_id: str, event: Any, model: str, pricing_model: str | None = None) -> None:
     author = getattr(event, 'author', 'workflow')
     input_tokens, output_tokens, total_tokens = usage_from_event(event)
-    cost = estimate_cost(model, input_tokens, output_tokens)
+    cost = estimate_cost(pricing_model or model, input_tokens, output_tokens)
     telemetry.record_usage(run_id, input_tokens, output_tokens, cost)
     content = getattr(event, 'content', None)
     detail = 'ADK event emitted'

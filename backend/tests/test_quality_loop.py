@@ -151,12 +151,16 @@ def test_workflow_wires_aggregator_output_into_canonical_state_key(monkeypatch):
 
     aggregator = workflow.sub_agents[3]
     quality_loop = workflow.sub_agents[4]
-    synthesis = workflow.sub_agents[5]
+    compliance_reviewer = workflow.sub_agents[5]
+    synthesis = workflow.sub_agents[6]
 
     assert aggregator.output_key == 'current_investigation'
     assert isinstance(quality_loop, LoopAgent)
     assert quality_loop.max_iterations == 3
+    assert compliance_reviewer.name == 'compliance_reviewer'
+    assert compliance_reviewer.output_key == 'compliance_review'
     assert 'current_investigation' in synthesis.instruction
+    assert 'compliance_review' in synthesis.instruction
 
 
 class _FakeMcp:

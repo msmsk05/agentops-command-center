@@ -6,6 +6,7 @@ from google.adk.agents import LlmAgent, LoopAgent, ParallelAgent, SequentialAgen
 
 from app.agents.analyst import create_analyst
 from app.agents.common import agent, make_quality_gate
+from app.agents.compliance import create_compliance_reviewer
 from app.agents.critic import create_critic
 from app.agents.decomposer import create_decomposer
 from app.agents.planner import create_planner
@@ -23,12 +24,13 @@ def build_workflow(settings: Settings, mcp_client: Any, a2a_client: Any, model: 
     decomposer = create_decomposer(model)
     research = create_researcher(model, mcp_client.search_documents, mcp_client.get_company_profile, mcp_client.retrieve_market_data)
     analyst = create_analyst(model)
-    risk = create_risk_analyst(model, a2a_client.assess_compliance)
+    risk = create_risk_analyst(model)
     parallel = ParallelAgent(name='parallel_investigation', description='Concurrent research, analysis, and risk investigation', sub_agents=[research, analyst, risk])
     aggregator = agent('aggregator', 'Shared-state aggregator', 'Merge {research_findings}, {analysis_findings}, and {risk_findings} into an evidence-linked investigation brief. Preserve contradictions and uncertainty.', model, 'current_investigation')
     quality_gate = make_quality_gate(settings.quality_threshold)
     critic = create_critic(model, quality_gate)
     revision = create_revision_agent(model)
     quality_loop = LoopAgent(name='quality_loop', description='Critique and revision loop with a bounded iteration limit', sub_agents=[critic, revision], max_iterations=settings.max_loop_iterations)
+    compliance_reviewer = create_compliance_reviewer(model, a2a_client.assess_compliance)
     synthesis = create_synthesis(model)
-    return SequentialAgent(name='orchestrator', description='Enterprise intelligence orchestration workflow', sub_agents=[planner, decomposer, parallel, aggregator, quality_loop, synthesis])
+    return SequentialAgent(name='orchestrator', description='Enterprise intelligence orchestration workflow', sub_agents=[planner, decomposer, parallel, aggregator, quality_loop, compliance_reviewer, synthesis])
