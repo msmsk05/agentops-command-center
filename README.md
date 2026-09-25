@@ -71,11 +71,14 @@ Copy `.env.example` and provide values in the platform secret managers. Only `NE
 - `CORS_ORIGINS`: comma-separated local, preview, and production frontend origins.
 - `DATABASE_URL`: production Postgres connection string; SQLite is suitable only for local development.
 - `MCP_SERVER_URL`, `A2A_COMPLIANCE_AGENT_URL`: deployed integration endpoints.
+- `A2A_PUBLIC_URL`: the publicly reachable base URL of this backend's own A2A agent (e.g. the Azure Container Apps HTTPS URL), advertised in the Agent Card `supportedInterfaces`. Defaults to `http://localhost:8080` for local development; must be set to the real public HTTPS URL in production so remote A2A clients don't receive `localhost`.
 - `OTEL_EXPORTER_OTLP_ENDPOINT`: optional OpenTelemetry collector endpoint.
 
 ### MCP and A2A
 
 Run the MCP service beside the backend or as its own private service, then set `MCP_SERVER_URL`. Its tools should be backed by curated demo data for reliable portfolio demonstrations. Deploy the compliance specialist as a separate HTTP A2A service and set `A2A_COMPLIANCE_AGENT_URL`; the agent must expose its agent card and task endpoint over HTTPS.
+
+This backend also exposes its own A2A Agent Card at `/.well-known/agent-card.json` (A2A 1.0 standard) and `/.well-known/agent.json` (legacy, kept for backward compatibility). Both advertise `A2A_PUBLIC_URL` as the agent's `supportedInterfaces` URL, so it must be set to the deployed HTTPS hostname (e.g. the Azure Container Apps URL) in production.
 
 ### Health checks and troubleshooting
 
