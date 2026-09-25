@@ -22,7 +22,7 @@ class TelemetryStore:
             'id': run_id, 'trace_id': trace_id, 'session_id': session_id,
             'status': 'running', 'started_at': datetime.now(timezone.utc).isoformat(),
             'task': task, 'events': [], 'input_tokens': 0, 'output_tokens': 0,
-            'total_tokens': 0, 'estimated_cost': 0.0,
+            'total_tokens': 0, 'estimated_cost': 0.0, 'cost_known': False,
         }
 
     async def emit(self, run_id: str, label: str, detail: str, kind: str, **data: Any) -> None:
@@ -43,6 +43,7 @@ class TelemetryStore:
         run['total_tokens'] = run['input_tokens'] + run['output_tokens']
         if cost is not None:
             run['estimated_cost'] = round(run['estimated_cost'] + cost, 8)
+            run['cost_known'] = True
 
     def finish(self, run_id: str, status: str, error: str | None = None) -> None:
         run = self.runs[run_id]
@@ -51,6 +52,12 @@ class TelemetryStore:
         run['duration_ms'] = round((time.time() - _iso_to_epoch(run['started_at'])) * 1000, 2)
         if error:
             run['error'] = error
+
+    def reset(self) -> None:
+        """Test-only: clears all in-memory state. Never called from production code paths."""
+        self.events.clear()
+        self.runs.clear()
+        self.waiters.clear()
 
 
 def _iso_to_epoch(value: str) -> float:

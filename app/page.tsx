@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Activity, ArrowUpRight, Bot, Check, ChevronRight, CircleDot, Clock3, Cpu, Database, GitBranch, Layers3, Play, Radio, RefreshCw, Search, Sparkles, Zap } from 'lucide-react';
 import { Agent, EventRecord, startRun, streamRun } from '@/lib/api';
+import MonitoringView from '@/components/Monitoring';
 
 const initialAgents: Agent[] = [
   { id: 'orchestrator', name: 'Orchestrator', role: 'Workflow control', type: 'sequential', status: 'complete', duration: 420, tokens: 742, cost: 0.004 },
@@ -87,6 +88,7 @@ export default function Home() {
 
       <section className="content">
         <header className="topbar"><div><span className="eyebrow"><CircleDot size={12} /> LIVE WORKFLOW</span><h1>{activeView}</h1></div><div className="top-actions"><span className="environment"><StatusDot status="complete" /> Production</span><button className="icon-button" aria-label="Search"><Search size={18} /></button><div className="avatar small">MS</div></div></header>
+        {activeView === 'Monitoring' ? <MonitoringView /> : (
         <div className="page-grid">
           <section className="main-column">
             <div className="command-panel"><div className="panel-heading"><div><span className="section-kicker">NEW INTELLIGENCE RUN</span><h2>What should the agents investigate?</h2></div><span className="shortcut">⌘ ↵</span></div><textarea value={task} onChange={(event) => setTask(event.target.value)} aria-label="Research task" /><div className="command-footer"><div className="run-options"><span><Zap size={14} /> Azure GPT-4o</span><span><GitBranch size={14} /> Sequential + parallel</span><span><Clock3 size={14} /> Max 3 iterations</span></div><button className="run-button" onClick={handleRun} disabled={running}><Play size={15} fill="currentColor" /> {running ? 'Orchestration active' : 'Run intelligence'}<ArrowUpRight size={15} /></button></div></div>
@@ -97,6 +99,7 @@ export default function Home() {
           </section>
           <aside className="metrics-column"><div className="run-status-card"><div className="status-header"><span className="section-kicker">CURRENT RUN</span><span className="run-live"><StatusDot status={running ? 'running' : 'complete'} /> {running ? 'Running' : 'Complete'}</span></div><div className="run-id">{runId}</div><div className="metric-large">{running ? '00:12.84' : '00:18.42'} <small>duration</small></div><div className="progress-track"><span style={{ width: `${Math.max(42, (totals.complete / agents.length) * 100)}%` }} /></div><div className="progress-meta"><span>{totals.complete} of {agents.length} agents complete</span><span>quality 0.79</span></div></div><div className="metrics-card"><div className="card-title"><span>Run economics</span><span className="estimate">ESTIMATES</span></div><Metric icon={<Cpu size={16} />} label="Total tokens" value={totals.tokens.toLocaleString()} trend="+12.4%" /><Metric icon={<Zap size={16} />} label="LLM cost" value={`$${totals.cost.toFixed(3)}`} trend="Azure GPT-4o" /><Metric icon={<Clock3 size={16} />} label="Avg. latency" value="2.84s" trend="p95 4.12s" /></div><div className="quality-card"><div className="quality-top"><span className="section-kicker">QUALITY LOOP</span><span className="iteration-badge">2 / 3</span></div><div className="quality-score">0.79 <span>quality score</span></div><div className="quality-bar"><span /></div><div className="quality-foot"><span>4 issues found</span><span>threshold 0.85</span></div></div><div className="integration-card"><div className="card-title"><span>Connected services</span><ArrowUpRight size={15} /></div><Integration icon={<Database size={17} />} name="MCP Knowledge Server" detail="4 tools available" status="Connected" /><Integration icon={<Radio size={17} />} name="A2A Compliance Agent" detail="Remote - Azure Container Apps" status="Healthy" /></div></aside>
         </div>
+        )}
       </section>
     </main>
   );
