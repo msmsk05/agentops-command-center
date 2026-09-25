@@ -4,4 +4,4 @@ from app.agents.common import agent
 
 
 def create_revision_agent(model: Any) -> LlmAgent:
-    return agent('revision', 'Revision specialist', 'Improve the aggregated answer using the latest {critique}. Resolve every supported issue, remove unsupported claims, and preserve evidence provenance.', model, 'revised_investigation')
+    return agent('revision', 'Revision specialist', 'Improve {current_investigation} using the latest {critique}. Resolve every supported issue, remove unsupported claims, and preserve evidence provenance. Return the full revised investigation brief.', model, 'current_investigation')

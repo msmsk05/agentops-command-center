@@ -5,4 +5,4 @@ from app.agents.schemas import QualityReview
 
 
 def create_critic(model: Any, quality_gate: Callable[..., Any]) -> LlmAgent:
-    return agent('critic', 'Quality evaluator', 'Evaluate the current aggregated answer for completeness, factual grounding, relevance, consistency, clarity, and unsupported assertions. Return JSON matching the quality schema, then call record_quality_review with the same values. Use the shared state from {investigation}.', model, 'critique', [quality_gate], QualityReview)
+    return agent('critic', 'Quality evaluator', 'Evaluate the current aggregated answer for completeness, factual grounding, relevance, consistency, clarity, and unsupported assertions. Return JSON matching the quality schema, then call record_quality_review with the same values. Use the shared state from {current_investigation}.', model, 'critique', [quality_gate], QualityReview)

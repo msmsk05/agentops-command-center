@@ -25,7 +25,7 @@ def build_workflow(settings: Settings, mcp_client: Any, a2a_client: Any, model: 
     analyst = create_analyst(model)
     risk = create_risk_analyst(model, a2a_client.assess_compliance)
     parallel = ParallelAgent(name='parallel_investigation', description='Concurrent research, analysis, and risk investigation', sub_agents=[research, analyst, risk])
-    aggregator = agent('aggregator', 'Shared-state aggregator', 'Merge {research_findings}, {analysis_findings}, and {risk_findings} into an evidence-linked investigation brief. Preserve contradictions and uncertainty.', model, 'investigation')
+    aggregator = agent('aggregator', 'Shared-state aggregator', 'Merge {research_findings}, {analysis_findings}, and {risk_findings} into an evidence-linked investigation brief. Preserve contradictions and uncertainty.', model, 'current_investigation')
     quality_gate = make_quality_gate(settings.quality_threshold)
     critic = create_critic(model, quality_gate)
     revision = create_revision_agent(model)
